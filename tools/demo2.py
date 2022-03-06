@@ -236,18 +236,6 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
 
     mmglobal.frame_count = 0;
     
-    # Definition of the parameters
-    max_cosine_distance = 0.75
-    nn_budget = None
-    nms_max_overlap = 1.0
-
-    # Deep SORT
-    model_filename = 'model_data/mars-small128.pb'
-    encoder = gdet.create_box_encoder(model_filename, batch_size=1) #function
-    
-    metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
-    tracker = Tracker(metric)
-    
     current_date = datetime.datetime.now().date()
     count_dict = {}
   
@@ -302,55 +290,29 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                   boxes = torch.Tensor(bbb)
                   confidence = a[1]
                   classes = a[2]
-                  #ต้องdeepsortเพราะอ่านแบบเว้นเฟรม
-                  features = encoder(frame, boxes)
-                  # represents a bounding box detection in a single image
-                  detections = [Detection(bbox, confidence, cls, feature) for bbox, confidence, cls, feature in
-                                zip(boxes, confidence, classes, features)]
-                  # Run non-maxima suppression.
-                  boxes = np.array([d.tlwh for d in detections])        # List ของ [x y w h] ในแต่ละเฟรม
-                  scores = np.array([d.confidence for d in detections]) # confidence
-                  classes = np.array([d.cls for d in detections])       # class
-                  indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores) #กรองเฟรมที่ซ้อนทับกันออก
-                  detections = [detections[i] for i in indices]
 
-                  # Call the tracker
-                  tracker.predict()   # ได้ mean vector และ covariance matrix จาก Kalman filter prediction step
-                  tracker.update(detections)
-
-                  for track in tracker.tracks:
-                      bbox = track.to_tlbr()    # (min x, miny, max x, max y)
-                      track_cls = track.cls
-                      cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
-                      if not track.is_confirmed() or track.time_since_update > 1:
-                          continue
-
-                      midpoint = track.tlbr_midpoint(bbox)
-                      # get midpoint respective to botton-left
-                      origin_midpoint = (midpoint[0], frame.shape[0] - midpoint[1])
-
-                      if track.track_id not in memory:
-                          memory[track.track_id] = deque(maxlen=2)  
-
-                      memory[track.track_id].append(midpoint)
-                      previous_midpoint = memory[track.track_id][0]
-                      origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
-                      TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line[0] ,line[1])
-                      if TC and (track.track_id not in already_counted):
-                          if (track_cls.item() == 1.0):
+                  for track in range(classes):
+                      boxwh =   bbb[track]   # (min x, miny, h, w)
+                      boxy =   a[track]      # (min x, miny, max x, max y)      
+                      track_cls = classes[track]
+                      cv2.rectangle(frame, (int(boxy[0]), int(boxy[1])), (int(boxy[2]), int(boxy[3])), (0, 255, 0), 2)
+                      minX, minY, maxX, maxY = boxy
+                      midpoint =  (int((minX + maxX) / 2), int((minY + maxY) / 2))
+                      m1 = (int((minX + maxX) / 2 - 0.01(frameX)), int((minY + maxY) / 2))
+                      m2 = (int((minX + maxX) / 2 + 0.01(frameX)), int((minY + maxY) / 2))
+                      TC = CheckCrossLine.LineCrossing(m1, m2, line[0] ,line[1])
+                      if TC:
+                          if (track_cls == "car"):
                             class_counter[0] += 1
-                          elif (track_cls.item() == 2.0):  
+                          elif (track_cls == "motorcycle"): 
                             class_counter[1] += 1
-                          elif (track_cls.item() == 3.0):
+                          elif (track_cls == "bus"):
                             class_counter[2] += 1
-                          elif (track_cls.item() == 4.0):  
+                          elif (track_cls == "truck"):
                             class_counter[3] += 1
                           class_counter[4] += 1
                           # draw alert line
                           cv2.line(frame, line[0], line[1], (0, 0, 255), 2)
-                          already_counted.append(track.track_id)  # Set already counted for ID to true.
-                          intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
-                          intersect_info.append([track_cls, origin_midpoint, intersection_time])
                           print("class_counter[car,motorcycle,bus,truck,all] = ",class_counter)
               
                 # Delete memory of old tracks.
