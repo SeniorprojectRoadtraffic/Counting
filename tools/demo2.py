@@ -289,16 +289,18 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                   boxes = torch.Tensor(bbb)
                   confidence = a[1]
                   classes = a[2]
-
-                  for track in range(classes):
-                      boxwh =   bbb[track]   # (min x, miny, h, w)
-                      boxy =   a[track]      # (min x, miny, max x, max y)      
+                  ntrack = 0
+                  for b in classes:
+                    ntrack = ntrack+1
+                  for track in range(ntrack):
+                      boxwh =  bbb[track]   # (min x, miny, h, w)
+                      boxy =   boxesA[track]      # (min x, miny, max x, max y)      
                       track_cls = classes[track]
                       cv2.rectangle(frame, (int(boxy[0]), int(boxy[1])), (int(boxy[2]), int(boxy[3])), (0, 255, 0), 2)
                       minX, minY, maxX, maxY = boxy
-                      midpoint =  (int((minX + maxX) / 2), int((minY + maxY) / 2))
-                      m1 = (int((minX + maxX) / 2 - 0.01(frameX)), int((minY + maxY) / 2))
-                      m2 = (int((minX + maxX) / 2 + 0.01(frameX)), int((minY + maxY) / 2))
+                      midpoint =  ((minX + maxX) / 2, (minY + maxY) / 2)
+                      m1 = ((minX + maxX) / 2 - 0.01*frameX, (minY + maxY) / 2)
+                      m2 = ((minX + maxX) / 2 + 0.01*frameX, (minY + maxY) / 2)
                       TC = CheckCrossLine.LineCrossing(m1, m2, line[0] ,line[1])
                       if TC:
                           if (track_cls == "car"):
