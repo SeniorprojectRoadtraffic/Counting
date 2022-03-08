@@ -182,11 +182,11 @@ class Predictor(object):
         bboxes /= ratio
         bboxes = bboxes.tolist()
         cls = output[:, 6].tolist()
-        scores = output[:, 4] * output[:, 5].tolist()
+        scores = output[:, 4] * output[:, 5]
+        scores = scores.tolist()
         a = [bboxes, scores, cls]
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
         return vis_res, a
-
 
 def image_demo(predictor, vis_folder, path, current_time, save_result):
     if os.path.isdir(path):
