@@ -298,10 +298,13 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                       track_cls = classes[track]
                       cv2.rectangle(frame, (int(boxy[0]), int(boxy[1])), (int(boxy[2]), int(boxy[3])), (0, 255, 0), 2)
                       minX, minY, maxX, maxY = boxy
-                      midpoint =  ((minX + maxX) / 2, (minY + maxY) / 2)
-                      m1 = ((minX + maxX) / 2 - 0.01*frameX, (minY + maxY) / 2)
-                      m2 = ((minX + maxX) / 2 + 0.01*frameX, (minY + maxY) / 2)
+                      midX = (minX + maxX) / 2
+                      midY = (minY + maxY) / 2
+                      midpoint =  (midX, midY)
+                      m1 = (int(midX - 0.05*frameX), int(midY)))
+                      m2 = (int(midX - 0.05*frameX), int(midY))
                       TC = CheckCrossLine.LineCrossing(m1, m2, line[0] ,line[1])
+                      cv2.line(frame, m1, m2, (255, 255, 255), 2)
                       if TC:
                           if (track_cls == "car"):
                             class_counter[0] += 1
