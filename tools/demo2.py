@@ -301,10 +301,10 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                       midX = (minX + maxX) / 2
                       midY = (minY + maxY) / 2
                       midpoint =  (midX, midY)
-                      m1 = (int(midX - 0.05*frameX), int(midY)))
-                      m2 = (int(midX - 0.05*frameX), int(midY))
+                      m1 = (int(midX - 0.001*frameX), int(midY))
+                      m2 = (int(midX + 0.001*frameX), int(midY))
                       TC = CheckCrossLine.LineCrossing(m1, m2, line[0] ,line[1])
-                      cv2.line(frame, m1, m2, (255, 255, 255), 2)
+                      cv2.line(frame, m1, m2, (0, 0, 255), 2)
                       if TC:
                           if (track_cls == "car"):
                             class_counter[0] += 1
