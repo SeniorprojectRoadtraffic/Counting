@@ -178,12 +178,11 @@ class Predictor(object):
         output = output.cpu()
 
         bboxes = output[:, 0:4]
-
         # preprocessing: resize
         bboxes /= ratio
-
-        cls = output[:, 6]
-        scores = output[:, 4] * output[:, 5]
+        bboxes = bboxes.tolist()
+        cls = output[:, 6].tolist()
+        scores = output[:, 4] * output[:, 5].tolist()
         a = [bboxes, scores, cls]
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
         return vis_res, a
