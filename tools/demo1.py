@@ -315,7 +315,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                   detections = [detections[i] for i in indices]
 
                   # Call the tracker
-                  tracker.predict()   # ได้ mean vector และ covariance matrix จาก Kalman filter prediction step
+                  tracker.predict()   # ใช้ Kalman 
                   tracker.update(detections)
 
                   for track in tracker.tracks:
