@@ -245,7 +245,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     model_filename = 'model_data/mars-small128.pb'
     encoder = gdet.create_box_encoder(model_filename, batch_size=1) #function
     
-    metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
+    metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)    #ระยะทางที่ใกล้ที่สุดไปยังตัวอย่างใดๆ
     tracker = Tracker(metric)
     
     current_date = datetime.datetime.now().date()
