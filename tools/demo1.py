@@ -322,7 +322,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                       bbox = track.to_tlbr()    # (min x, miny, max x, max y)
                       track_cls = track.cls
                       cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (0, 255, 0), 2)
-                      cv2.putText(frame, "ID {}".format(str(track.track_id)), (bbox[0], bbox[1]-0.05 * frame.shape[0]), 0, 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
+                      cv2.putText(frame, "ID {}".format(str(track.track_id)), (int(bbox[0]), int(bbox[1]-0.05 * frame.shape[0])), 0, 1.5e-3 * frame.shape[0], (0, 255, 255), 2)
                       if not track.is_confirmed() or track.time_since_update > 1:
                           continue
 
