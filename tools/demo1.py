@@ -393,6 +393,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             else:
                 mmglobal.frame_count +=1
         else:
+            print("class_counter[car,motorcycle,bus,truck,all] = ",class_counter)
             break
 
 
