@@ -11,8 +11,8 @@ __all__ = ["vis"]
 
 def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
 
-    #with open("/content/drive/MyDrive/hlp-01-20210610-205037-cut.mp4.txt", "a") as writefile:
-      #writefile.write("# Frame %d, %d" % (mmglobal.frame_count, len(boxes))+"\n")
+    with open("/content/Counting/notevis.txt", "a") as writefile:
+      writefile.write("# Frame %d, %d" % (mmglobal.frame_count, len(boxes))+"\n")
       #print("# Frame %d, %d" % (mmglobal.frame_count, len(boxes)))
     
     txt_size = []
@@ -46,11 +46,10 @@ def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
         cv2.putText(img, text, (x0, y0 + txt_size[1]), font, 0.4, txt_color, thickness=1)
 
         # Hui log
-
         #print("%s: (%d,%d)-(%d,%d)"%(class_names[cls_id],x0,y0,x1,y1))
         #print("%d,%s,%d,%d,%d,%d,%.2f,%d" % (i, class_names[cls_id], x0, y0, x1, y1, score * 100, mmglobal.frame_count))
-        #with open("/content/drive/MyDrive/hlp-01-20210610-205037-cut.mp4.txt", "a") as writefile:
-          #writefile.write("%d,%s,%d,%d,%d,%d,%.2f,%d" % (i, class_names[cls_id], x0, y0, x1, y1, score * 100, mmglobal.frame_count)+"\n")
+        with open("/content/Counting/notevis.txt", "a") as writefile:
+          writefile.write("%d,%s,%d,%d,%d,%d,%.2f,%d" % (i, class_names[cls_id], x0, y0, x1, y1, score * 100, mmglobal.frame_count)+"\n")
     #file.close()
     if len(txt_size):
         text = 'Frame {} count {}'.format(mmglobal.frame_count, len(boxes))
@@ -58,7 +57,6 @@ def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
         cv2.putText(img, text, (2, 2 + txt_size[1]), font, 0.4, txt_color, thickness=1)
 
     return img
-
 
 _COLORS = np.array(
     [
