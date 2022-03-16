@@ -184,7 +184,7 @@ class Predictor(object):
 
         cls = output[:, 6]
         scores = output[:, 4] * output[:, 5]
-        a = [bboxes, scores, cls]
+        a = [bboxes, scores, cls, self.cls_names]
         vis_res = vis(img, bboxes, scores, cls, cls_conf, self.cls_names)
         return vis_res, a
 
@@ -271,7 +271,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     cv2.line(frame, line[0], line[1], (255, 255, 255), 2)
     frameN = 0    
     while True:
-        print("Frame ",frameN)
+        #print("Frame ",frameN)
         frameN += 1
         if (test == 1):
             test = 0
@@ -302,6 +302,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                   boxes = torch.Tensor(bbb)
                   confidence = a[1]
                   classes = a[2]
+                  class_n = a[3]
                   #ต้องdeepsortเพราะอ่านแบบเว้นเฟรม
                   features = encoder(frame, boxes)
                   # represents a bounding box detection in a single image
@@ -338,13 +339,15 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                       origin_previous_midpoint = (previous_midpoint[0], frame.shape[0] - previous_midpoint[1])
                       TC = CheckCrossLine.LineCrossing(midpoint, previous_midpoint, line[0] ,line[1])
                       if TC and (track.track_id not in already_counted):
-                          if (track_cls.item() == 1.0):
+                          cls_id = int(track_cls.item())
+                          cls_name = class_n[cls_id]
+                          if (cls_name == "bus"):
                             class_counter[0] += 1
-                          elif (track_cls.item() == 2.0):  
+                          elif (cls_name == "car"):  
                             class_counter[1] += 1
-                          elif (track_cls.item() == 3.0):
+                          elif (cls_name == "motorcycle"):
                             class_counter[2] += 1
-                          elif (track_cls.item() == 4.0):  
+                          elif (cls_name == "truck"):  
                             class_counter[3] += 1
                           class_counter[4] += 1
                           # draw alert line
@@ -352,7 +355,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                           already_counted.append(track.track_id)  # Set already counted for ID to true.
                           intersection_time = datetime.datetime.now() - datetime.timedelta(microseconds=datetime.datetime.now().microsecond)
                           intersect_info.append([track_cls, origin_midpoint, intersection_time])
-                          print("class_counter[car,motorcycle,bus,truck,all] = ",class_counter)
+                          print("Frame ",frameN)
+                          print("[car,motorcycle,bus,truck,all] = ",class_counter)
               
                 # Delete memory of old tracks.
                 # This needs to be larger than the number of tracked objects in the frame.
@@ -367,13 +371,13 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                 cv2.putText(frame, "Total: {}".format(str(class_counter[4])), (int(0.05 * frame.shape[1]), int(yy)), 0,
                     1.5e-3 * frame.shape[0], (0, 255, 255), 2)
                 yy = yy + (0.05 * frame.shape[0])
-                cv2.putText(frame, "car: {}".format(str(class_counter[0])), (int(0.05 * frame.shape[1]), int(yy)), 0,
+                cv2.putText(frame, "bus: {}".format(str(class_counter[0])), (int(0.05 * frame.shape[1]), int(yy)), 0,
                     1.5e-3 * frame.shape[0], (0, 255, 255), 2)
                 yy = yy + (0.05 * frame.shape[0])
-                cv2.putText(frame, "motorcycle: {}".format(str(class_counter[1])), (int(0.05 * frame.shape[1]), int(yy)), 0,
+                cv2.putText(frame, "car: {}".format(str(class_counter[1])), (int(0.05 * frame.shape[1]), int(yy)), 0,
                     1.5e-3 * frame.shape[0], (0, 255, 255), 2)
                 yy = yy + (0.05 * frame.shape[0])
-                cv2.putText(frame, "bus: {}".format(str(class_counter[2])), (int(0.05 * frame.shape[1]), int(yy)), 0,
+                cv2.putText(frame, "motorcycle: {}".format(str(class_counter[2])), (int(0.05 * frame.shape[1]), int(yy)), 0,
                     1.5e-3 * frame.shape[0], (0, 255, 255), 2)
                 yy = yy + (0.05 * frame.shape[0])
                 cv2.putText(frame, "truck: {}".format(str(class_counter[3])), (int(0.05 * frame.shape[1]), int(yy)), 0,
@@ -393,7 +397,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             else:
                 mmglobal.frame_count +=1
         else:
-            print("class_counter[car,motorcycle,bus,truck,all] = ",class_counter)
+            print("[bus,car,motorcycle,truck,all] = ",class_counter)
             break
 
 
